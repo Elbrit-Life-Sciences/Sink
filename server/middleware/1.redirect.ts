@@ -54,7 +54,8 @@ export default eventHandler(async (event) => {
       const query = getQuery(event)
       
       // Merge JSON data with query parameters (JSON data takes precedence)
-      const mergedParams = mergeParams(jsonData, query)
+      // Exclude urltoken from parameters passed to redirect URL
+      const mergedParams = mergeParams(jsonData, query, ['urltoken'])
       
       // Check if the link has expired and has an expiry redirect URL
       const currentTime = Math.floor(Date.now() / 1000)
@@ -64,15 +65,13 @@ export default eventHandler(async (event) => {
         return sendRedirect(event, expiryTarget, +useRuntimeConfig(event).redirectStatusCode)
       }
       
-      // Check for urltoken in merged parameters
-      const urltoken = mergedParams.urltoken as string | undefined
+      // Get urltoken from original parameters (before exclusion)
+      const originalParams = mergeParams(jsonData, query)
+      const urltoken = originalParams.urltoken as string | undefined
       if (urltoken) {
         try {
-          // Decode base64 to get the date string
-          const decodedDate = atob(urltoken)
-          
           // Parse the date (yyyy-mm-dd format)
-          const tokenDate = new Date(decodedDate)
+          const tokenDate = new Date(urltoken)
           const currentDate = new Date()
           
           // Reset time portion to compare just the dates
