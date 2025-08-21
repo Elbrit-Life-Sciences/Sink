@@ -14,11 +14,10 @@ const { title, email, telegram, blog, twitter, mastodon, github } = useAppConfig
       >{{ title }}</a>
       <a
         class="mt-4 text-sm text-gray-500 sm:ml-4 sm:pl-4 sm:border-l sm:border-gray-200 sm:mt-0"
-        href="https://html.zone"
+        href="#"
         target="_blank"
-        title="HTML.ZONE"
       >
-        &copy; {{ new Date().getFullYear() }} Products of HTML.ZONE
+        © {{ new Date().getFullYear() }} Elbrit Life Sciences. All rights reserved.
       </a>
       <span
         class="inline-flex justify-center mt-4 space-x-5 sm:ml-auto sm:mt-0 sm:justify-start"

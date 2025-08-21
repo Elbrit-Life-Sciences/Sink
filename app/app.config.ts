@@ -1,7 +1,7 @@
 export default defineAppConfig({
-  title: 'Elbrit URL Shortener',
+  title: 'Elbrit',
   email: 'info@elbrit.org',
-  github: 'https://github.com/ccbikai/sink',
+  // github: 'https://github.com/ccbikai/sink',
   description: 'Professional URL shortening service for Elbrit Life Sciences.',
   image: 'https://sink.cool/banner.png',
   previewTTL: 300, // 5 minutes
