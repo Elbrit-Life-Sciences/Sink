@@ -18,6 +18,7 @@ export const LinkSchema = z.object({
     message: 'expiration must be greater than current time',
     path: ['expiration'],
   }).optional(),
+  expiryRedirectUrl: z.string().trim().url().max(2048).optional(),
   title: z.string().trim().max(2048).optional(),
   description: z.string().trim().max(2048).optional(),
   image: z.string().trim().url().max(2048).optional(),

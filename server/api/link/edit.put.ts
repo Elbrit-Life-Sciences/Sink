@@ -29,6 +29,7 @@ export default eventHandler(async (event) => {
         expiration,
         url: newLink.url,
         comment: newLink.comment,
+        expiryRedirectUrl: newLink.expiryRedirectUrl,
       },
     })
     setResponseStatus(event, 201)

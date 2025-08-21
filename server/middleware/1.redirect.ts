@@ -36,6 +36,15 @@ export default eventHandler(async (event) => {
       catch (error) {
         console.error('Failed write access log:', error)
       }
+      
+      // Check if the link has expired and has an expiry redirect URL
+      const currentTime = Math.floor(Date.now() / 1000)
+      if (link.expiration && currentTime > link.expiration && link.expiryRedirectUrl) {
+        // If link has expired and has an expiry redirect URL, use that instead
+        const expiryTarget = redirectWithQuery ? withQuery(link.expiryRedirectUrl, getQuery(event)) : link.expiryRedirectUrl
+        return sendRedirect(event, expiryTarget, +useRuntimeConfig(event).redirectStatusCode)
+      }
+      
       const query = getQuery(event)
       const urltoken = query.urltoken as string | undefined
       if (urltoken) {
@@ -53,7 +62,12 @@ export default eventHandler(async (event) => {
           
           // If current date is after token date, URL is invalid
           if (currentDate > tokenDate) {
-            // Return a 410 Gone or custom error page
+            // If there's an expiry redirect URL, use that
+            if (link.expiryRedirectUrl) {
+              const expiryTarget = redirectWithQuery ? withQuery(link.expiryRedirectUrl, getQuery(event)) : link.expiryRedirectUrl
+              return sendRedirect(event, expiryTarget, +useRuntimeConfig(event).redirectStatusCode)
+            }
+            // Otherwise return an error
             return createError({
               statusCode: 410,
               statusMessage: 'Link Expired',
