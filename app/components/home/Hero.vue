@@ -5,7 +5,7 @@ const { title, description } = useAppConfig()
 </script>
 
 <template>
-  <main class="flex flex-col items-center justify-center min-h-[80vh] py-16 text-center bg-gradient-to-b from-slate-50 to-slate-100">
+  <main class="flex flex-col items-center justify-center min-h-[80vh] py-16 text-center bg-gradient-to-b from-background to-background/95 dark:from-background dark:to-background/90">
     <div class="mb-10">
       <img 
         src="/logo-elbrit.png" 
@@ -14,10 +14,10 @@ const { title, description } = useAppConfig()
       />
     </div>
     <div class="max-w-3xl mx-auto px-4">
-      <h1 class="text-5xl font-bold lg:text-6xl xl:text-7xl tracking-tight mb-6 text-slate-800">
+      <h1 class="text-5xl font-bold lg:text-6xl xl:text-7xl tracking-tight mb-6 text-foreground">
         {{ title }}
       </h1>
-      <p class="max-w-2xl mx-auto mt-4 text-xl text-slate-600 mb-12">
+      <p class="max-w-2xl mx-auto mt-4 text-xl text-muted-foreground mb-12">
         {{ description }}
       </p>
       <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
@@ -32,7 +32,7 @@ const { title, description } = useAppConfig()
         </HomeLink>
       </div>
     </div>
-    <div class="mt-16 text-sm text-slate-500">
+    <div class="mt-16 text-sm text-muted-foreground/80">
       © {{ new Date().getFullYear() }} Elbrit Life Sciences. All rights reserved.
     </div>
   </main>
