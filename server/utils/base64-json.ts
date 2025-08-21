@@ -24,14 +24,21 @@ export function decodeBase64Json(base64String: string): Record<string, any> | nu
  * JSON data takes precedence over query parameters
  * @param jsonData The JSON data object
  * @param queryParams The query parameters object
+ * @param excludeParams Array of parameter names to exclude from the result
  * @returns Merged parameters object
  */
 export function mergeParams(
   jsonData: Record<string, any> | null,
-  queryParams: Record<string, any>
+  queryParams: Record<string, any>,
+  excludeParams: string[] = []
 ): Record<string, any> {
   if (!jsonData) {
-    return queryParams
+    // If no JSON data, just filter out excluded params from query params
+    const filteredParams = { ...queryParams }
+    excludeParams.forEach(param => {
+      delete filteredParams[param]
+    })
+    return filteredParams
   }
   
   // Create a new object with query params as base
@@ -41,6 +48,11 @@ export function mergeParams(
   for (const key in jsonData) {
     mergedParams[key] = jsonData[key]
   }
+  
+  // Remove excluded parameters
+  excludeParams.forEach(param => {
+    delete mergedParams[param]
+  })
   
   return mergedParams
 }
