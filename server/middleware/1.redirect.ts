@@ -57,14 +57,6 @@ export default eventHandler(async (event) => {
       // Exclude urltoken from parameters passed to redirect URL
       const mergedParams = mergeParams(jsonData, query, ['urltoken'])
       
-      // Check if the link has expired and has an expiry redirect URL
-      const currentTime = Math.floor(Date.now() / 1000)
-      if (link.expiration && currentTime > link.expiration && link.expiryRedirectUrl) {
-        // If link has expired and has an expiry redirect URL, use that instead
-        const expiryTarget = redirectWithQuery ? withQuery(link.expiryRedirectUrl, mergedParams) : link.expiryRedirectUrl
-        return sendRedirect(event, expiryTarget, +useRuntimeConfig(event).redirectStatusCode)
-      }
-      
       // Get urltoken from original parameters (before exclusion)
       const originalParams = mergeParams(jsonData, query)
       const urltoken = originalParams.urltoken as string | undefined
