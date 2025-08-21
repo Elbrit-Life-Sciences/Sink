@@ -1,9 +1,16 @@
 import type { LinkSchema } from '@@/schemas/link'
 import type { z } from 'zod'
 import { parsePath, withQuery } from 'ufo'
+import { decodeBase64Json, mergeParams } from '../utils/base64-json'
 
 export default eventHandler(async (event) => {
-  const { pathname: slug } = parsePath(event.path.replace(/^\/|\/$/g, '')) // remove leading and trailing slashes
+  // Remove leading and trailing slashes
+  const cleanPath = event.path.replace(/^\/|\/$/g, '')
+  
+  // Split path to extract slug and optional base64 JSON data
+  const pathParts = cleanPath.split('/')
+  const slug = pathParts[0]
+  const base64JsonData = pathParts.length > 1 ? pathParts[1] : null
   const { slugRegex, reserveSlug } = useAppConfig(event)
   const { homeURL, linkCacheTtl, redirectWithQuery, caseSensitive } = useRuntimeConfig(event)
   const { cloudflare } = event.context
@@ -37,16 +44,28 @@ export default eventHandler(async (event) => {
         console.error('Failed write access log:', error)
       }
       
+      // Decode base64 JSON data if present
+      let jsonData = null
+      if (base64JsonData) {
+        jsonData = decodeBase64Json(base64JsonData)
+      }
+      
+      // Get query parameters
+      const query = getQuery(event)
+      
+      // Merge JSON data with query parameters (JSON data takes precedence)
+      const mergedParams = mergeParams(jsonData, query)
+      
       // Check if the link has expired and has an expiry redirect URL
       const currentTime = Math.floor(Date.now() / 1000)
       if (link.expiration && currentTime > link.expiration && link.expiryRedirectUrl) {
         // If link has expired and has an expiry redirect URL, use that instead
-        const expiryTarget = redirectWithQuery ? withQuery(link.expiryRedirectUrl, getQuery(event)) : link.expiryRedirectUrl
+        const expiryTarget = redirectWithQuery ? withQuery(link.expiryRedirectUrl, mergedParams) : link.expiryRedirectUrl
         return sendRedirect(event, expiryTarget, +useRuntimeConfig(event).redirectStatusCode)
       }
       
-      const query = getQuery(event)
-      const urltoken = query.urltoken as string | undefined
+      // Check for urltoken in merged parameters
+      const urltoken = mergedParams.urltoken as string | undefined
       if (urltoken) {
         try {
           // Decode base64 to get the date string
@@ -64,7 +83,7 @@ export default eventHandler(async (event) => {
           if (currentDate > tokenDate) {
             // If there's an expiry redirect URL, use that
             if (link.expiryRedirectUrl) {
-              const expiryTarget = redirectWithQuery ? withQuery(link.expiryRedirectUrl, getQuery(event)) : link.expiryRedirectUrl
+              const expiryTarget = redirectWithQuery ? withQuery(link.expiryRedirectUrl, mergedParams) : link.expiryRedirectUrl
               return sendRedirect(event, expiryTarget, +useRuntimeConfig(event).redirectStatusCode)
             }
             // Otherwise return an error
@@ -85,7 +104,7 @@ export default eventHandler(async (event) => {
             })
         }
       }
-      const target = redirectWithQuery ? withQuery(link.url, getQuery(event)) : link.url
+      const target = redirectWithQuery ? withQuery(link.url, mergedParams) : link.url
       return sendRedirect(event, target, +useRuntimeConfig(event).redirectStatusCode)
     }
   }
