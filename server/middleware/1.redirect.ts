@@ -54,21 +54,21 @@ export default eventHandler(async (event) => {
       const query = getQuery(event)
       
       // Merge JSON data with query parameters (JSON data takes precedence)
-      // Exclude urltoken from parameters passed to redirect URL
-      const mergedParams = mergeParams(jsonData, query, ['urltoken'])
+      // Exclude ex_date from parameters passed to redirect URL
+      const mergedParams = mergeParams(jsonData, query, ['ex_date'])
       
-      // Get urltoken from original parameters (before exclusion)
+      // Get ex_date from original parameters (before exclusion)
       const originalParams = mergeParams(jsonData, query)
-      const urltoken = originalParams.urltoken as string | undefined
-      if (urltoken) {
+      const expiryDate = originalParams.ex_date as string | undefined
+      if (expiryDate) {
         try {
-          // Parse the date (yyyy-mm-dd format)
-          const tokenDate = new Date(urltoken)
+          // Parse the date (yyyy-mm-ddTHH:mm format)
+          const tokenDate = new Date(expiryDate)
           const currentDate = new Date()
           
           // Reset time portion to compare just the dates
-          currentDate.setHours(0, 0, 0, 0)
-          tokenDate.setHours(0, 0, 0, 0)
+          // currentDate.setHours(0, 0, 0, 0)
+          // tokenDate.setHours(0, 0, 0, 0)
           
           // If current date is after token date, URL is invalid
           if (currentDate > tokenDate) {
@@ -86,12 +86,12 @@ export default eventHandler(async (event) => {
           }
         }
         catch (error) {
-          console.error('Failed to process urltoken:', error)
+          console.error('Failed to process expiryDate:', error)
           // Optional: Return error for invalid token format
             return createError({
               statusCode: 410,
               statusMessage: 'Invalid Link',
-              message: 'Invalid urltoken.'
+              message: 'Invalid Token.'
             })
         }
       }
