@@ -8,9 +8,26 @@ export default eventHandler(async (event) => {
   const cleanPath = event.path.replace(/^\/|\/$/g, '')
   
   // Split path to extract slug and optional base64 JSON data
+  // Handle case where path might contain query parameters
   const pathParts = cleanPath.split('/')
-  const slug = pathParts[0]
-  const base64JsonData = pathParts.length > 1 ? pathParts[1] : null
+  
+  // Extract the slug, ensuring we don't include query parameters
+  let slug = pathParts[0]
+  // Remove any query parameters from slug if present
+  if (slug && slug.includes('?')) {
+    slug = slug.split('?')[0]
+  }
+  
+  // Handle base64JsonData which might also contain query parameters
+  let base64JsonData = null
+  if (pathParts.length > 1) {
+    base64JsonData = pathParts[1]
+    // Remove any query parameters from base64JsonData if present
+    if (base64JsonData && base64JsonData.includes('?')) {
+      base64JsonData = base64JsonData.split('?')[0]
+    }
+  }
+  
   const { slugRegex, reserveSlug } = useAppConfig(event)
   const { homeURL, linkCacheTtl, redirectWithQuery, caseSensitive } = useRuntimeConfig(event)
   const { cloudflare } = event.context
