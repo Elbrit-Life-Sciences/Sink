@@ -182,6 +182,7 @@ function copyLink() {
               </TooltipTrigger>
               <TooltipContent>
                 <p>Expires At: {{ longDate(link.expiration) }}</p>
+                <p v-if="link.expiryRedirectUrl">{{ $t('links.expiry_redirect_to') }}: {{ link.expiryRedirectUrl }}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

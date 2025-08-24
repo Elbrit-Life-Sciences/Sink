@@ -37,6 +37,7 @@ const EditLinkSchema = LinkSchema.pick({
     image: true,
   }).extend({
     expiration: z.coerce.date().optional(),
+    expiryRedirectUrl: z.string().trim().url().max(2048).optional(),
   }).optional(),
 })
 
@@ -47,6 +48,10 @@ const fieldConfig = {
   optional: {
     comment: {
       component: 'textarea',
+    },
+    expiryRedirectUrl: {
+      label: t('links.expiry_redirect_url'),
+      description: t('links.expiry_redirect_url_description'),
     },
   },
 }
@@ -67,6 +72,7 @@ const form = useForm({
     url: link.value.url,
     optional: {
       comment: link.value.comment,
+      expiryRedirectUrl: link.value.expiryRedirectUrl,
     },
   },
   validateOnMount: isEdit,
